@@ -1,5 +1,5 @@
 flask >= 0.12
-SQLAlchemy >= 1.1.5
+flask-SQLAlchemy >= 2.1
 flask-restful >= 0.3.5
 flask-admin >= 1.4.2
 flask-mail >= 0.9.1
