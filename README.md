@@ -6,6 +6,11 @@ _All things should be done in project dir_
 ```bash
 sudo apt-get update
 sudo apt-get install postgresql postgresql-contrib
+
+sudo -u postgres createuser --interactive //there you should input <username>
+sudo -u postgres createdb exon
+sudo -u postgres psql << "ALTER USER <username> with encrypted password <your_password>;"
+
 ```
 ## Install [virtualenv](https://virtualenv.pypa.io/en/stable/)
 ```bash
