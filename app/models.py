@@ -27,8 +27,8 @@ class Role(db.Model):
 
 
 class UserRoles(db.Model):
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
-    role_id = db.Column(db.Integer, db.ForeignKey('role.id', ondelete='CASCADE'))
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE'))
+    role_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'))
 
 
 class UserMail(db.Model):
