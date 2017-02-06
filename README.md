@@ -29,3 +29,8 @@ source env/bin/activate
 pip install -r requirements.txt
 ```
 
+## Deactivate environment
+```bash
+deactivate
+```
+
