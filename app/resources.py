@@ -1,4 +1,4 @@
-from app import models, db
+from app import models
 from flask_restful import Resource, reqparse, fields, marshal_with
 
 user_parser = reqparse.RequestParser()
@@ -80,7 +80,6 @@ class TariffList(Resource):
 
     def post(self):
         tariff = models.Tariff()
-        db.session.add(tariff)
         return 201
 
 
@@ -107,8 +106,3 @@ class Login(Resource):
 class Logout(Resource):
     def post(self):
         return 200
-
-# Routes for api
-api.add_resource(UserList, '/users')
-api.add_resource(UserEmails, '/users/<user_id/emails>')
-api.add_resource(User, '/users/<user_id>')
