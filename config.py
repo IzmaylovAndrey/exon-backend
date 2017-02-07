@@ -3,7 +3,6 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/exon'
 SQLALCHEMY_TRACK_MODIFICATIONS = True
-FLASK_DEBUG = True
 
 # TODO: Config mailing
 # MAIL_USERNAME = 'email@example.com'
@@ -28,3 +27,6 @@ USER_ENABLE_RETYPE_PASSWORD = True  # Prompt for `retype password` in:
 USER_ENABLE_USERNAME = False  # Register and Login with username
 # USER_AFTER_LOGIN_ENDPOINT = 'user_page'
 # USER_AFTER_LOGOUT_ENDPOINT = 'home_page'
+
+FLASK_DEBUG = True
+SECRET_KEY = 'i_wanna_know_it'

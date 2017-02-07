@@ -10,9 +10,8 @@ db = SQLAlchemy(app)
 # lm.init_app(app)
 api = Api(app)
 
-from app import models
 from app.resources import User, UserList, UserEmails
 # Routes for api
 api.add_resource(UserList, '/users')
-api.add_resource(UserEmails, '/users/<user_id/emails>')
+api.add_resource(UserEmails, '/users/<user_id>/emails')
 api.add_resource(User, '/users/<user_id>')
