@@ -1,4 +1,4 @@
-from app import db, app
+from app import app, db
 from flask_user import UserMixin, SQLAlchemyAdapter, UserManager
 
 
