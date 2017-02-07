@@ -5,7 +5,7 @@ _All things should be done in project dir_
 ## Install [PostgreSQL](https://www.postgresql.org/)
 ```bash
 sudo apt-get update
-sudo apt-get install postgresql postgresql-contrib
+sudo apt-get install postgresql postgresql-contrib python-psycopg2
 
 sudo -u postgres createuser --interactive //there you should input <username>
 sudo -u postgres createdb exon
