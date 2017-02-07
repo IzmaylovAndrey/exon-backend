@@ -2,6 +2,7 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/exon'
+SQLALCHEMY_TRACK_MODIFICATIONS = True
 FLASK_DEBUG = True
 
 # TODO: Config mailing
