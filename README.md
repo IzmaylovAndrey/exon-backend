@@ -1,7 +1,7 @@
 ## System requirements
 
 - Python 3.5
-- PostgreSQL 9.6
+- PostgreSQL 9.5
 - Python-Psycopg2
 - Virtualenv
 

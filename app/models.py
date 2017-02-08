@@ -19,7 +19,7 @@ class User(db.Model, UserMixin):
 
     roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
     user_emails = db.relationship('UserMail')
-    tariff = db.relationship('Tariff')
+    tariff = db.Column(db.ForeignKey('tariff.id'))
 
 
 class Role(db.Model):
@@ -28,7 +28,6 @@ class Role(db.Model):
 
 
 class UserRoles(db.Model):
-    __tablename__ = 'UserRoles'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE'))
     role_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete='CASCADE'))
