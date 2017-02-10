@@ -57,23 +57,15 @@ class User(Resource):
         self.parser.add_argument('address', type=str)
         super(User, self).__init__()
 
-    @staticmethod
-    def get_by_id_or_404(id):
-        user = models.User.query.filter(models.User.id == id).all()
-        if len(user) == 0:
-            abort(404)
-        user = user[0]
-        return user
-
     @marshal_with(user_fields)
     def get(self, id):
-        user = self.get_by_id_or_404(id=id)
+        user = models.User.query.filter(models.User.id == id).first_or_404()
         return user
 
     # auth_req
     @marshal_with(user_fields)
     def put(self, id):
-        user = self.get_by_id_or_404(id=id)
+        user = models.User.query.filter(models.User.id == id).first_or_404()
         args = self.parser.parse_args()
         for k, v in args.items():
             if v is not None:
@@ -84,7 +76,7 @@ class User(Resource):
     # admin_role
     @marshal_with(user_fields)
     def delete(self, id):
-        user = self.get_by_id_or_404(id=id)
+        user = models.User.query.filter(models.User.id == id).first_or_404()
         db.session.delete(user)
         db.session.commit()
         return http_status_message(204)
@@ -182,14 +174,14 @@ class UserEmails(Resource):
     # auth_req or admin_role
     @marshal_with(mail_fields, envelope='emails')
     def get(self, id):
-        user = User.get_by_id_or_404(id)
+        user = models.User.query.filter(models.User.id == id).first_or_404()
         return user.user_emails
 
     # auth_req or admin_role
     # TODO: new email confirmation
     @marshal_with(mail_fields, envelope='emails')
     def post(self, id):
-        user = User.get_by_id_or_404(id)
+        user = models.User.query.filter(models.User.id == id).first_or_404()
         args = self.parser.parse_args()
         email = models.UserMail()
 
@@ -234,7 +226,7 @@ class ChangeUsername(Resource):
     # auth_req
     @marshal_with(user_fields)
     def post(self, id):
-        user = User.get_by_id_or_404(id)
+        user = models.User.query.filter(models.User.id == id).first_or_404()
         args = self.parser.parse_args()
         args = args['args']
         user.username = args['username']
@@ -249,7 +241,7 @@ class ChangePassword(Resource):
     # auth_req
     @marshal_with(user_fields)
     def post(self, id):
-        user = User.get_by_id_or_404(id)
+        user = models.User.query.filter(models.User.id == id).first_or_404()
         args = self.parser.parse_args()
         args = args['args']
         user.password = hash_password(models.user_manager, password=args['new_password'])
