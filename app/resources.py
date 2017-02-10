@@ -1,6 +1,6 @@
 from time import time
 
-from flask_restful import Resource, reqparse, fields, marshal_with, abort, http_status_message
+from flask_restful import Resource, reqparse, fields, marshal_with, http_status_message
 from flask_user.passwords import hash_password
 from flask_login import logout_user, login_user
 # TODO: add roles and auth decorators
@@ -128,6 +128,7 @@ class TariffList(Resource):
         self.parser.add_argument('name', type=str, required=True, help='No tariff name provided')
         self.parser.add_argument('price', type=float, required=True, help='No tariff price provided')
         self.parser.add_argument('description', type=str)
+        super(TariffList, self).__init__()
 
     @marshal_with(tariff_fields, envelope='tariffs')
     def get(self):
@@ -152,6 +153,7 @@ class Tariff(Resource):
         self.parser.add_argument('name', type=str, required=True, help='No tariff name provided')
         self.parser.add_argument('price', type=float, required=True, help='No tariff price provided')
         self.parser.add_argument('description', type=str)
+        super(Tariff, self).__init__()
 
     def get(self, id):
         return models.Tariff.query.get(id)
@@ -160,7 +162,7 @@ class Tariff(Resource):
     def put(self, id):
         return models.Tariff.query.get(id), 202
 
-    #admin_role
+    # admin_role
     def delete(self, id):
         return 204
 
@@ -170,6 +172,7 @@ class UserEmails(Resource):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('email', type=str, required=True, help='No email provided')
         self.parser.add_argument('is_primary', type=bool)
+        super(UserEmails, self).__init__()
 
     # auth_req or admin_role
     @marshal_with(mail_fields, envelope='emails')
@@ -201,6 +204,7 @@ class Login(Resource):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('username', type=str, required=True)
         self.parser.add_argument('password', type=str, required=True)
+        super(Login, self).__init__()
 
     def post(self):
         args = self.parser.parse_args()
@@ -222,6 +226,7 @@ class ChangeUsername(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('new_username', type=str)
+        super(ChangeUsername, self).__init__()
 
     # auth_req
     @marshal_with(user_fields)
@@ -237,6 +242,7 @@ class ChangePassword(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('new_password', type=str)
+        super(ChangePassword, self).__init__()
 
     # auth_req
     @marshal_with(user_fields)
