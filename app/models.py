@@ -20,11 +20,13 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
     user_emails = db.relationship('UserMail')
     tariff_id = db.Column(db.Integer, db.ForeignKey('tariff.id'))
+    tariff_on_date = db.Column(db.DateTime())
+    tariff_off_date = db.Column(db.DateTime())
 
 
 class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    role = db.Column(db.String(32), nullable=False, unique=True)
+    name = db.Column(db.String(32), nullable=False, unique=True)
 
 
 class UserRoles(db.Model):
