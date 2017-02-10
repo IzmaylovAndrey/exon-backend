@@ -48,8 +48,14 @@ source env/bin/activate
 pip install -r requirements.txt
 ```
 
-### Deactivate environment
+### To deactivate environment
 ```bash
 deactivate
 ```
 
+### Upgrade db to last migration
+
+```bash
+python manage.py db init
+python manage.py db upgrage
+```
