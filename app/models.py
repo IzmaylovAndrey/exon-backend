@@ -1,5 +1,4 @@
-from app import app
-from app import db
+from app import app, db
 from flask_user import UserMixin, SQLAlchemyAdapter, UserManager
 
 
@@ -7,7 +6,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
 
     username = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False, default='')
+    password = db.Column(db.String(255), nullable=False)
 
     is_enabled = db.Column(db.Boolean, default=True)
 
@@ -20,7 +19,7 @@ class User(db.Model, UserMixin):
 
     roles = db.relationship('Role', secondary='user_roles', backref=db.backref('users', lazy='dynamic'))
     user_emails = db.relationship('UserMail')
-    tariff = db.Column(db.ForeignKey('tariff.id'))
+    tariff_id = db.Column(db.Integer, db.ForeignKey('tariff.id'))
 
 
 class Role(db.Model):
