@@ -11,8 +11,9 @@ class User(db.Model, UserMixin):
 
     is_enabled = db.Column(db.Boolean, default=True)
 
-    first_name = db.Column(db.String(20), nullable=False)
-    last_name = db.Column(db.String(20), nullable=False)
+    # TODO: Return nullable=False
+    first_name = db.Column(db.String(20))
+    last_name = db.Column(db.String(20))
     company = db.Column(db.String(50))
     address = db.Column(db.String(120))
     phone = db.Column(db.String(15))
