@@ -1,12 +1,11 @@
-from time import time
-
 from flask_restful import Resource, reqparse, fields, marshal_with, http_status_message
 from flask_user.passwords import hash_password
 from flask_login import logout_user, login_user
 # TODO: add roles and auth decorators
-# from flask_user.decorators import login_required, roles_required
+from app.decorators import login_required
 
 from app import models, db
+from app.models import user_manager
 
 tariff_fields = {
     'id': fields.Integer,
@@ -29,8 +28,8 @@ user_fields = {
     'phone': fields.String,
     'company': fields.String,
     'address': fields.String,
-    'emails': fields.List(fields.Nested(mail_fields)),
-    'tariff': fields.Nested(tariff_fields, allow_null=True),
+    'emails': fields.Nested(mail_fields),
+    'tariff_id': fields.Integer,
 }
 
 # mail_list_fields = {
@@ -42,14 +41,18 @@ user_fields = {
 
 
 def get_default_tariff():
-    tariff = models.Tariff.query().filter(models.Tariff.name == 'default').first()
+    tariff = models.Tariff.query.filter(models.Tariff.name == 'default').first_or_404()
     return tariff
+
+
+def get_user_role():
+    role = models.Role.query.filter(models.Role.name == 'user').first_or_404()
+    return role
 
 
 class User(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        # self.parser.add_argument('id', type=int)
         self.parser.add_argument('first_name', type=str)
         self.parser.add_argument('last_name', type=str)
         self.parser.add_argument('phone', type=str)
@@ -62,7 +65,7 @@ class User(Resource):
         user = models.User.query.filter(models.User.id == id).first_or_404()
         return user
 
-    # auth_req
+    @login_required
     @marshal_with(user_fields)
     def put(self, id):
         user = models.User.query.filter(models.User.id == id).first_or_404()
@@ -104,20 +107,28 @@ class UserList(Resource):
     def post(self):
         args = self.parser.parse_args()
         user = models.User()
+
         for k, v in args.items():
             if v is not None:
+                if k is 'password':
+                    setattr(user, k, hash_password(user_manager, v))
                 setattr(user, k, v)
-        user.tariff = get_default_tariff()
+        user.tariff_id = get_default_tariff().id
         db.session.add(user)
-        db.session.commit()
 
-        email = models.UserMail()
-        email.user_id = user.id
-        email.email = user.username
-        email.is_primary = True
+        mail = models.UserMail()
+        mail.user_id = user.id
+        mail.email = user.username
+        mail.is_primary = True
         # TODO: new email confirmation
-        email.confirmed_at = time()
-        db.session.add(email)
+        # email.confirmed_at = time()
+        db.session.add(mail)
+
+        user_role = models.UserRoles()
+        user_role.role_id = get_user_role().id
+        user_role.user_id = user.id
+        db.session.add(user_role)
+
         db.session.commit()
         return models.User.query.all(), 201
 
@@ -155,34 +166,48 @@ class Tariff(Resource):
         self.parser.add_argument('description', type=str)
         super(Tariff, self).__init__()
 
+    @marshal_with(tariff_fields)
     def get(self, id):
-        return models.Tariff.query.get(id)
+        return models.Tariff.query.filter(models.Tariff.id == id).first_or_404()
 
     # admin_role
+    @marshal_with(tariff_fields)
     def put(self, id):
+        tariff = models.Tariff.query.filter(models.Tariff.id == id).first_or_404()
+        args = self.parser.parse_args()
+        for k, v in args.items():
+            if v is not None:
+                setattr(tariff, k, v)
+        db.session.commit()
         return models.Tariff.query.get(id), 202
 
     # admin_role
+    @marshal_with(tariff_fields)
     def delete(self, id):
-        return 204
+        tariff = models.Tariff.query.filter(models.Tariff.id == id).first_or_404()
+        db.session.delete(tariff)
+        db.session.commit()
+        return http_status_message(204)
 
 
 class UserEmails(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('email', type=str, required=True, help='No email provided')
-        self.parser.add_argument('is_primary', type=bool)
+        self.parser.add_argument('is_primary', type=bool, default=False)
         super(UserEmails, self).__init__()
 
-    # auth_req or admin_role
-    @marshal_with(mail_fields, envelope='emails')
+    # or admin_role
+    @marshal_with(mail_fields)
+    @login_required
     def get(self, id):
         user = models.User.query.filter(models.User.id == id).first_or_404()
         return user.user_emails
 
-    # auth_req or admin_role
+    # or admin_role
     # TODO: new email confirmation
-    @marshal_with(mail_fields, envelope='emails')
+    @login_required
+    @marshal_with(mail_fields)
     def post(self, id):
         user = models.User.query.filter(models.User.id == id).first_or_404()
         args = self.parser.parse_args()
@@ -192,11 +217,20 @@ class UserEmails(Resource):
             setattr(email, k, v)
         email.user_id = user.id
         # TODO: new email confirmation
-        email.confirmed_at = time()
+        # email.confirmed_at = time()
 
         db.session.add(email)
         db.session.commit()
         return user.user_emails, 201
+
+
+# TODO: create resource to get, edit, delete emails
+class Mail(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('email', type=str)
+        self.parser.add_argument('is_primary', type=bool)
+        super(Mail, self).__init__()
 
 
 class Login(Resource):
@@ -204,22 +238,23 @@ class Login(Resource):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('username', type=str, required=True)
         self.parser.add_argument('password', type=str, required=True)
+        self.parser.add_argument('remember', type=bool, default=False)
+        self.parser.add_argument('force', type=bool, default=False)
         super(Login, self).__init__()
 
     def post(self):
         args = self.parser.parse_args()
-        args = args['args']
         user = models.User.query.filter(models.User.username == args['username']).first_or_404()
-        if user.password == hash_password(models.user_manager, args['password']):
-            login_user(user)
-        return 200
+        if models.user_manager.verify_password(password=args['password'], user=user):
+            login_user(user, remember=args['remember'], force=args['force'])
+        return http_status_message(200)
 
 
 class Logout(Resource):
-    # auth_req
+    @login_required
     def post(self, id):
         logout_user()
-        return 200
+        return http_status_message(200)
 
 
 class ChangeUsername(Resource):
@@ -228,14 +263,14 @@ class ChangeUsername(Resource):
         self.parser.add_argument('new_username', type=str)
         super(ChangeUsername, self).__init__()
 
-    # auth_req
+    @login_required
     @marshal_with(user_fields)
     def post(self, id):
         user = models.User.query.filter(models.User.id == id).first_or_404()
         args = self.parser.parse_args()
         args = args['args']
         user.username = args['username']
-        return user
+        return user, 202
 
 
 class ChangePassword(Resource):
@@ -244,11 +279,11 @@ class ChangePassword(Resource):
         self.parser.add_argument('new_password', type=str)
         super(ChangePassword, self).__init__()
 
-    # auth_req
+    @login_required
     @marshal_with(user_fields)
     def post(self, id):
         user = models.User.query.filter(models.User.id == id).first_or_404()
         args = self.parser.parse_args()
         args = args['args']
         user.password = hash_password(models.user_manager, password=args['new_password'])
-        return user
+        return user, 202

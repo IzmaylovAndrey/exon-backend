@@ -4,6 +4,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 SQLALCHEMY_DATABASE_URI = 'postgresql:///exon'
 SQLALCHEMY_TRACK_MODIFICATIONS = True
 FLASK_DEBUG = True
+# TODO: generate and export to env any random key
 SECRET_KEY = 'i_wanna_know_it'
 
 # TODO: Configure mailing
