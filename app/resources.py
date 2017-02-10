@@ -1,7 +1,7 @@
 from flask_restful import Resource, reqparse, fields, marshal_with, http_status_message
 from flask_user.passwords import hash_password
 from flask_login import logout_user, login_user
-# TODO: add roles and auth decorators
+# TODO: add roles
 from app.decorators import login_required
 
 from app import models, db
@@ -216,7 +216,6 @@ class UserEmails(Resource):
         for k, v in args.items():
             setattr(email, k, v)
         email.user_id = user.id
-        # TODO: new email confirmation
         # email.confirmed_at = time()
 
         db.session.add(email)
@@ -225,12 +224,38 @@ class UserEmails(Resource):
 
 
 # TODO: create resource to get, edit, delete emails
+# TODO: email confirmation
 class Mail(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('email', type=str)
         self.parser.add_argument('is_primary', type=bool)
         super(Mail, self).__init__()
+
+    @login_required
+    @marshal_with(tariff_fields)
+    def get(self, id):
+        return models.UserMail.query.filter(models.UserMail.id == id).first_or_404()
+
+    # or admin_role
+    @login_required
+    @marshal_with(tariff_fields)
+    def put(self, id):
+        tariff = models.UserMail.query.filter(models.UserMail.id == id).first_or_404()
+        args = self.parser.parse_args()
+        for k, v in args.items():
+            if v is not None:
+                setattr(tariff, k, v)
+        db.session.commit()
+        return models.UserMail.query.get(id), 202
+
+    # admin_role
+    @marshal_with(tariff_fields)
+    def delete(self, id):
+        tariff = models.UserMail.query.filter(models.Tariff.id == id).first_or_404()
+        db.session.delete(tariff)
+        db.session.commit()
+        return http_status_message(204)
 
 
 class Login(Resource):
