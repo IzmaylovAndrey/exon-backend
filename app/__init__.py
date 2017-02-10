@@ -10,11 +10,19 @@ db = SQLAlchemy(app)
 # lm.init_app(app)
 api = Api(app)
 
-from app.resources import User, UserEmails, UserList, TariffList, Login, Logout
+from app.resources import User, UserEmails, UserList, TariffList, Login, Logout, ChangeUsername, ChangePassword, \
+                          Tariff, Mail
+
 # Routes for api
 api.add_resource(UserList, '/users', endpoint='users')
-api.add_resource(UserEmails, '/users/<int:id>/emails', endpoint='user_emails')
-api.add_resource(User, '/users/<int:id>', endpoint='user')
-api.add_resource(TariffList, '/tariffs', endpoint='tariffs')
+
 api.add_resource(Login, '/login', endpoint='login')
 api.add_resource(Logout, '/logout', endpoint='logout')
+api.add_resource(ChangePassword, '/change_password', endpoint='change_password')
+api.add_resource(ChangeUsername, '/change_username', endpoint='change_username')
+api.add_resource(User, '/users/<int:id>', endpoint='user')
+api.add_resource(UserEmails, '/users/<int:id>/emails', endpoint='user_emails')
+
+api.add_resource(TariffList, '/tariffs', endpoint='tariffs')
+
+api.add_resource(Tariff, '/tariff/<int:id>', endpoint='tariff')
