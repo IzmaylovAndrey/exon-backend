@@ -5,7 +5,7 @@ from flask_user import UserMixin, SQLAlchemyAdapter, UserManager
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(100), unique=True, nullable=False)
+    username = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
 
     is_enabled = db.Column(db.Boolean, default=True)
@@ -38,7 +38,7 @@ class UserRoles(db.Model):
 class UserMail(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'))
-    email = db.Column(db.String(100), unique=True)
+    email = db.Column(db.String(50), unique=True)
     is_primary = db.Column(db.Boolean, default=False)
     confirmed_at = db.Column(db.DateTime())
 
