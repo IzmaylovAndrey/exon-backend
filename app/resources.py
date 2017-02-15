@@ -1,4 +1,4 @@
-from flask_restful import Resource, reqparse, fields, marshal_with, http_status_message
+from flask_restful import Resource, reqparse, fields, marshal_with, http_status_message, abort
 from flask_user.passwords import hash_password
 from flask_login import logout_user, login_user
 # TODO: add roles
@@ -102,7 +102,6 @@ class UserList(Resource):
     def get(self):
         return models.User.query.all()
 
-    # registration endpoint
     @marshal_with(user_fields)
     def post(self):
         args = self.parser.parse_args()
@@ -265,19 +264,22 @@ class Login(Resource):
         self.parser.add_argument('password', type=str, required=True)
         self.parser.add_argument('remember', type=bool, default=False)
         self.parser.add_argument('force', type=bool, default=False)
+        self.parser.add_argument('fresh', type=bool, default=True)
         super(Login, self).__init__()
 
     def post(self):
         args = self.parser.parse_args()
         user = models.User.query.filter(models.User.username == args['username']).first_or_404()
         if models.user_manager.verify_password(password=args['password'], user=user):
-            login_user(user, remember=args['remember'], force=args['force'])
+            login_user(user, remember=args['remember'], force=args['force'], fresh=args['fresh'])
+        else:
+            return abort(400, message="Wrong password")
         return http_status_message(200)
 
 
 class Logout(Resource):
     @login_required
-    def post(self, id):
+    def post(self):
         logout_user()
         return http_status_message(200)
 
