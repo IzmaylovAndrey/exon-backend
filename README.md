@@ -1,14 +1,22 @@
 ## System requirements
-
 - Python 3.5
 - PostgreSQL 9.5
 - Python-Psycopg2
 - Virtualenv
 
+## Project structure
+- /app - app code dir
+- /docs - docs dir
+- /migrations
+- config.py - config file, should be improved
+- manage.py - file for making migrations and db upgrade. 
+Docs on [Flask-Migrate](https://flask-migrate.readthedocs.io/en/latest/)
+- requirements.txt - file with description of necessary python packages for installation from pip
+- run.py - file for running application
 
 ## Deployment
 
-**All things should be done in project dir**
+**All things should be done in project dir(besides postgres)**
 
 ### Install python3
 
