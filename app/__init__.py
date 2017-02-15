@@ -14,15 +14,15 @@ from app.resources import User, UserEmails, UserList, TariffList, Login, Logout,
                           Tariff, Mail
 
 # Routes for api
-api.add_resource(UserList, '/users', endpoint='users')
+api.add_resource(UserList, '/api/users', endpoint='users')
 
-api.add_resource(Login, '/login', endpoint='login')
-api.add_resource(Logout, '/logout', endpoint='logout')
-api.add_resource(ChangePassword, '/change_password', endpoint='change_password')
-api.add_resource(ChangeUsername, '/change_username', endpoint='change_username')
-api.add_resource(User, '/users/<int:id>', endpoint='user')
-api.add_resource(UserEmails, '/users/<int:id>/emails', endpoint='user_emails')
+api.add_resource(Login, '/api/login', endpoint='login')
+api.add_resource(Logout, '/api/logout', endpoint='logout')
+api.add_resource(ChangePassword, '/api/change_password', endpoint='change_password')
+api.add_resource(ChangeUsername, '/api/change_username', endpoint='change_username')
+api.add_resource(User, '/api/users/<int:id>', endpoint='user')
+api.add_resource(UserEmails, '/api/users/<int:id>/emails', endpoint='user_emails')
 
-api.add_resource(TariffList, '/tariffs', endpoint='tariffs')
+api.add_resource(TariffList, '/api/tariffs', endpoint='tariffs')
 
-api.add_resource(Tariff, '/tariff/<int:id>', endpoint='tariff')
+api.add_resource(Tariff, '/api/tariff/<int:id>', endpoint='tariff')
